@@ -1,5 +1,3 @@
-export const runtime = "edge";
-
 import { NextRequest, NextResponse } from "next/server";
 import { Paddle, Environment, EventName } from "@paddle/paddle-node-sdk";
 import { createServiceRoleSupabase } from "@/lib/supabase/server";

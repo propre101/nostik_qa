@@ -1,5 +1,3 @@
-export const runtime = "edge";
-
 import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getQuestions, getStats, getMaxLength, getFreeQuestionsOpen } from "@/lib/actions";
