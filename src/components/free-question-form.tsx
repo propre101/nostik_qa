@@ -28,6 +28,7 @@ export function FreeQuestionForm() {
   const [pending, setPending] = useState(false);
   const [topic, setTopic] = useState("");
   const [gender, setGender] = useState("");
+  const [content, setContent] = useState("");
   const [isOpen, setIsOpen] = useState(true);
   const [captchaToken, setCaptchaToken] = useState("");
 
@@ -37,6 +38,14 @@ export function FreeQuestionForm() {
   }, []);
 
   async function handleSubmit(formData: FormData) {
+    if (!topic) {
+      setError("Please select a topic.");
+      return;
+    }
+    if (!gender) {
+      setError("Please select a gender.");
+      return;
+    }
     if (!captchaToken) {
       setError("Please complete the CAPTCHA verification.");
       return;
@@ -45,6 +54,7 @@ export function FreeQuestionForm() {
     setError(null);
     formData.set("topic", topic);
     formData.set("gender", gender);
+    formData.set("content", content);
     formData.set("cf-turnstile-response", captchaToken);
     const result = await submitFreeQuestion(formData);
     if (result?.error) {
@@ -119,10 +129,15 @@ export function FreeQuestionForm() {
             <Textarea
               name="content"
               placeholder="Type your anonymous question here... 🤔"
+              value={content}
               maxLength={maxLength}
               rows={4}
               required
-              onChange={(e) => setCharCount(e.target.value.length)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setContent(v);
+                setCharCount(v.length);
+              }}
               className="resize-none"
             />
             <span className="absolute bottom-2 right-3 text-xs text-muted-foreground">

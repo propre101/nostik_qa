@@ -65,16 +65,7 @@ export default function HomePage() {
             rel="noopener noreferrer"
             className="underline underline-offset-2 hover:text-foreground"
           >
-            @proper
-          </a>
-          {" · "}
-          <a
-            href="https://github.com/sponsors/propre101"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline underline-offset-2 hover:text-foreground"
-          >
-            💜 Sponsor
+            @propre
           </a>
         </p>
         <p className="flex items-center justify-center gap-3">
@@ -94,6 +85,15 @@ export default function HomePage() {
             className="underline underline-offset-2 hover:text-foreground"
           >
             🐙 GitHub
+          </a>
+          {" · "}
+          <a
+            href="https://github.com/sponsors/propre101"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            💜 Sponsor
           </a>
         </p>
       </footer>
