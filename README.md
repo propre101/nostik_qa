@@ -7,7 +7,7 @@ A secure, anonymous Q&A platform for live-stream shows. No login, no tracking fo
 - **Next.js 15** (App Router) — full-stack framework
 - **Tailwind CSS** + **shadcn/ui** — styling and components
 - **Supabase** — PostgreSQL database + admin auth
-- **Stripe** — VIP question payments ($5)
+- **patreon** — VIP question Starting at $5/month
 
 ## Setup
 
@@ -28,12 +28,8 @@ npm install
 
 3. Create an admin user in **Authentication > Users > Add User** (email + password).
 
-### 3. Stripe
 
-1. Get your **Secret Key** from the [Stripe Dashboard](https://dashboard.stripe.com/apikeys).
-2. For production, set up a webhook endpoint pointing to `/api/stripe/webhook` and copy the **Webhook Signing Secret**.
-
-### 4. Environment Variables
+### 3. Environment Variables
 
 Copy `.env.local.example` to `.env.local` and fill in your keys:
 
@@ -41,7 +37,7 @@ Copy `.env.local.example` to `.env.local` and fill in your keys:
 cp .env.local.example .env.local
 ```
 
-### 5. Run
+### 4. Run
 
 ```bash
 npm run dev
