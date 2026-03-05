@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { submitFreeQuestion, getMaxLength, getFreeQuestionsOpen } from "@/lib/actions";
+import { Turnstile } from "@/components/turnstile";
 
 const TOPICS = [
   { value: "love", label: "❤️ Love" },
@@ -28,6 +29,7 @@ export function FreeQuestionForm() {
   const [topic, setTopic] = useState("");
   const [gender, setGender] = useState("");
   const [isOpen, setIsOpen] = useState(true);
+  const [captchaToken, setCaptchaToken] = useState("");
 
   useEffect(() => {
     getMaxLength().then(setMaxLength);
@@ -35,10 +37,15 @@ export function FreeQuestionForm() {
   }, []);
 
   async function handleSubmit(formData: FormData) {
+    if (!captchaToken) {
+      setError("Please complete the CAPTCHA verification.");
+      return;
+    }
     setPending(true);
     setError(null);
     formData.set("topic", topic);
     formData.set("gender", gender);
+    formData.set("cf-turnstile-response", captchaToken);
     const result = await submitFreeQuestion(formData);
     if (result?.error) {
       setError(result.error);
@@ -122,10 +129,16 @@ export function FreeQuestionForm() {
               {charCount}/{maxLength}
             </span>
           </div>
+          <div className="flex justify-center">
+            <Turnstile
+              onVerify={(token) => setCaptchaToken(token)}
+              onExpire={() => setCaptchaToken("")}
+            />
+          </div>
           {error && (
             <p className="text-sm text-destructive">⚠️ {error}</p>
           )}
-          <Button type="submit" className="w-full" disabled={pending}>
+          <Button type="submit" className="w-full" disabled={pending || !captchaToken}>
             {pending ? "⏳ Submitting..." : "🚀 Submit Question"}
           </Button>
         </form>

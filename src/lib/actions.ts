@@ -72,10 +72,28 @@ export async function updateMaxLength(newLength: number) {
 const VALID_TOPICS = ["love", "career", "depression", "random", "other"];
 const VALID_GENDERS = ["male", "female", "other"];
 
+async function verifyTurnstile(token: string): Promise<boolean> {
+  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      secret: process.env.TURNSTILE_SECRET_KEY!,
+      response: token,
+    }),
+  });
+  const data = await res.json();
+  return data.success === true;
+}
+
 export async function submitFreeQuestion(formData: FormData) {
   const isOpen = await getFreeQuestionsOpen();
   if (!isOpen) {
     return { error: "Free questions are currently closed." };
+  }
+
+  const turnstileToken = formData.get("cf-turnstile-response") as string | null;
+  if (!turnstileToken || !(await verifyTurnstile(turnstileToken))) {
+    return { error: "CAPTCHA verification failed. Please try again." };
   }
 
   const content = formData.get("content") as string | null;

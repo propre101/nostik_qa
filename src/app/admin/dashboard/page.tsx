@@ -49,7 +49,6 @@ export default async function AdminDashboardPage({
       <div className="space-y-5">
         <StatsCards
           total={stats.total}
-          free={stats.free}
           pending={stats.pending}
           answered={stats.answered}
         />
