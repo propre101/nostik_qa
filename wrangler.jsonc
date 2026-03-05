@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "qa",
+  "name": "nostik",
   "compatibility_date": "2026-03-05",
   "compatibility_flags": [
     "nodejs_compat"
