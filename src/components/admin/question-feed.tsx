@@ -28,7 +28,7 @@ const TOPIC_FILTERS = [
   { value: "all", label: "All" },
   { value: "love", label: "❤️" },
   { value: "career", label: "💼" },
-  { value: "depression", label: "🧠" },
+  { value: "depression", label: "💊" },
   { value: "random", label: "🎲" },
   { value: "other", label: "💭" },
 ];

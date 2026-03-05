@@ -18,7 +18,7 @@ interface Question {
 const TOPIC_LABELS: Record<string, string> = {
   love: "❤️ Love",
   career: "💼 Career",
-  depression: "🧠 Mental Health",
+  depression: "💊 Health",
   random: "🎲 Random",
   other: "💭 Other",
 };

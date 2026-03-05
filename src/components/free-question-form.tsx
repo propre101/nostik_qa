@@ -10,7 +10,7 @@ import { Turnstile } from "@/components/turnstile";
 const TOPICS = [
   { value: "love", label: "❤️ Love" },
   { value: "career", label: "💼 Career" },
-  { value: "depression", label: "🧠 Mental Health" },
+  { value: "depression", label: "💊 Health" },
   { value: "random", label: "🎲 Random" },
   { value: "other", label: "💭 Other" },
 ];
