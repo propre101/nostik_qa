@@ -24,7 +24,7 @@ export default function HomePage() {
             💖 Sponsor
           </a>
           <a
-            href="https://github.com/propre101/nostik_questions"
+            href="https://github.com/propre101/nostik_qa"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-lg border border-border/40 px-4 py-2 text-xs text-muted-foreground/70 transition-colors hover:border-border hover:text-muted-foreground"
@@ -79,7 +79,7 @@ export default function HomePage() {
           </a>
           {" · "}
           <a
-            href="https://github.com/propre101/nostik_questions"
+            href="https://github.com/propre101/nostik_qa"
             target="_blank"
             rel="noopener noreferrer"
             className="underline underline-offset-2 hover:text-foreground"
