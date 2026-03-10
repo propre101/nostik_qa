@@ -16,6 +16,39 @@ export default function HomePage() {
         <p className="mt-3 text-lg text-muted-foreground">
           🕵️ Ask your question anonymously. No login. No tracking.
         </p>
+
+        {/* Sidebar Left Banners (Desktop Only) */}
+        <div className="hidden xl:flex flex-col gap-8 fixed left-[max(1rem,calc(50vw-45rem))] top-1/2 -translate-y-1/2">
+          <AdBanner 
+            dataKey="215a567b5a5d6c1643cfb84062df1d56" 
+            format="iframe" 
+            height={250} 
+            width={300} 
+          />
+          <AdBanner 
+            dataKey="215a567b5a5d6c1643cfb84062df1d56" 
+            format="iframe" 
+            height={250} 
+            width={300} 
+          />
+        </div>
+
+        {/* Sidebar Right Banners (Desktop Only) */}
+        <div className="hidden xl:flex flex-col gap-8 fixed right-[max(1rem,calc(50vw-45rem))] top-1/2 -translate-y-1/2">
+          <AdBanner 
+            dataKey="215a567b5a5d6c1643cfb84062df1d56" 
+            format="iframe" 
+            height={250} 
+            width={300} 
+          />
+          <AdBanner 
+            dataKey="215a567b5a5d6c1643cfb84062df1d56" 
+            format="iframe" 
+            height={250} 
+            width={300} 
+          />
+        </div>
+
         <div className="mt-6 flex items-center justify-center gap-3">
           <a
             href="https://github.com/sponsors/propre101"

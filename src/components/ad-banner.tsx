@@ -15,30 +15,49 @@ export function AdBanner({
   width: number;
   className?: string;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    if (containerRef.current.hasChildNodes()) return; // Already initialized
+    if (!iframeRef.current) return;
+    
+    const doc = iframeRef.current.contentWindow?.document;
+    if (!doc) return;
+    
+    // Check if we already initialized to avoid React Strict Mode double-runs
+    if (doc.getElementById("adsterra-script")) return;
 
-    const conf = document.createElement("script");
-    const script = document.createElement("script");
-
-    script.type = "text/javascript";
-    script.src = `https://www.highperformanceformat.com/${dataKey}/invoke.js`;
-
-    conf.type = "text/javascript";
-    conf.innerHTML = `atOptions = {
-      'key' : '${dataKey}',
-      'format' : '${format}',
-      'height' : ${height},
-      'width' : ${width},
-      'params' : {}
-    };`;
-
-    containerRef.current.append(conf);
-    // Append the invoke.js script right after configuring options
-    containerRef.current.append(script);
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { 
+              margin: 0; 
+              padding: 0; 
+              display: flex; 
+              justify-content: center; 
+              align-items: center; 
+              background: transparent; 
+              overflow: hidden;
+            }
+          </style>
+        </head>
+        <body>
+          <script id="adsterra-script" type="text/javascript">
+            atOptions = {
+              'key' : '${dataKey}',
+              'format' : '${format}',
+              'height' : ${height},
+              'width' : ${width},
+              'params' : {}
+            };
+          </script>
+          <script type="text/javascript" src="https://www.highperformanceformat.com/${dataKey}/invoke.js"></script>
+        </body>
+      </html>
+    `);
+    doc.close();
   }, [dataKey, format, height, width]);
 
   return (
@@ -46,11 +65,15 @@ export function AdBanner({
       <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest mb-1">
         Ad
       </span>
-      <div 
-        ref={containerRef} 
-        className="flex justify-center items-center w-full"
-        style={{ minHeight: height }}
-      ></div>
+      <iframe
+        ref={iframeRef}
+        width={width}
+        height={height}
+        sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
+        scrolling="no"
+        frameBorder="0"
+        style={{ border: "none", display: "block", width: `${width}px`, height: `${height}px` }}
+      />
     </div>
   );
 }
