@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
 export function AdBanner({
   dataKey,
   format,
@@ -15,50 +13,39 @@ export function AdBanner({
   width: number;
   className?: string;
 }) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  useEffect(() => {
-    if (!iframeRef.current) return;
-    
-    const doc = iframeRef.current.contentWindow?.document;
-    if (!doc) return;
-    
-    // Check if we already initialized to avoid React Strict Mode double-runs
-    if (doc.getElementById("adsterra-script")) return;
-
-    doc.open();
-    doc.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { 
-              margin: 0; 
-              padding: 0; 
-              display: flex; 
-              justify-content: center; 
-              align-items: center; 
-              background: transparent; 
-              overflow: hidden;
-            }
-          </style>
-        </head>
-        <body>
-          <script id="adsterra-script" type="text/javascript">
-            atOptions = {
-              'key' : '${dataKey}',
-              'format' : '${format}',
-              'height' : ${height},
-              'width' : ${width},
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="https://www.highperformanceformat.com/${dataKey}/invoke.js"></script>
-        </body>
-      </html>
-    `);
-    doc.close();
-  }, [dataKey, format, height, width]);
+  // Using srcDoc allows the iframe to render its own document context immediately.
+  // This bypasses Next.js blocking `document.write` that Adsterra's invoke.js relies on,
+  // and avoids React Strict Mode double-rendering issues.
+  const srcDoc = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background: transparent; 
+            overflow: hidden;
+          }
+        </style>
+      </head>
+      <body>
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '${dataKey}',
+            'format' : '${format}',
+            'height' : ${height},
+            'width' : ${width},
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/${dataKey}/invoke.js"></script>
+      </body>
+    </html>
+  `;
 
   return (
     <div className={`flex flex-col items-center justify-center my-4 w-full ${className || ""}`}>
@@ -66,12 +53,12 @@ export function AdBanner({
         Ad
       </span>
       <iframe
-        ref={iframeRef}
+        srcDoc={srcDoc}
         width={width}
         height={height}
-        sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
         scrolling="no"
         frameBorder="0"
+        title={`Adsterra ${width}x${height}`}
         style={{ border: "none", display: "block", width: `${width}px`, height: `${height}px` }}
       />
     </div>

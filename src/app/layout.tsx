@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "@/components/session-provider";
 import Script from "next/script";
 import { AdBanner } from "@/components/ad-banner";
+import { AdblockDetector } from "@/components/adblock-detector";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -47,6 +48,8 @@ export default function RootLayout({
             className="my-1" 
           />
         </div>
+
+        <AdblockDetector />
       </body>
     </html>
   );
