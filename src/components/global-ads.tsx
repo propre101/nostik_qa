@@ -15,12 +15,13 @@ export function GlobalAds() {
 
   return (
     <>
-      {/* Popunder script */}
-      <Script 
-        src="https://pl28887136.effectivegatecpm.com/46/71/de/4671deb8ab4d438cae52337aaa9ddb77.js" 
-        strategy="afterInteractive" 
-      />
-      
+      {/* Popunder script ONLY on success page */}
+      {pathname === "/success" && (
+        <Script 
+          src="https://pl28887136.effectivegatecpm.com/46/71/de/4671deb8ab4d438cae52337aaa9ddb77.js" 
+          strategy="afterInteractive" 
+        />
+      )}
       {/* Sticky Mobile Footer Ad */}
       <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center bg-background/80 backdrop-blur-sm border-t md:hidden">
         <AdBanner 

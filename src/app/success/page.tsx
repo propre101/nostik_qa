@@ -14,39 +14,6 @@ export default async function SuccessPage({
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4 py-8 space-y-8 w-full max-w-md mx-auto">
-      
-      {/* Sidebar Left Banners (Desktop Only) */}
-      <div className="hidden xl:flex flex-col gap-8 fixed left-[max(1rem,calc(50vw-45rem))] top-1/2 -translate-y-1/2">
-        <AdBanner 
-          dataKey="215a567b5a5d6c1643cfb84062df1d56" 
-          format="iframe" 
-          height={250} 
-          width={300} 
-        />
-        <AdBanner 
-          dataKey="215a567b5a5d6c1643cfb84062df1d56" 
-          format="iframe" 
-          height={250} 
-          width={300} 
-        />
-      </div>
-
-      {/* Sidebar Right Banners (Desktop Only) */}
-      <div className="hidden xl:flex flex-col gap-8 fixed right-[max(1rem,calc(50vw-45rem))] top-1/2 -translate-y-1/2">
-        <AdBanner 
-          dataKey="215a567b5a5d6c1643cfb84062df1d56" 
-          format="iframe" 
-          height={250} 
-          width={300} 
-        />
-        <AdBanner 
-          dataKey="215a567b5a5d6c1643cfb84062df1d56" 
-          format="iframe" 
-          height={250} 
-          width={300} 
-        />
-      </div>
-
       <Card className="w-full text-center z-10">
         <CardContent className="space-y-4 pt-8 pb-8">
           <p className="text-5xl">{isVip ? "👑" : "🎉"}</p>

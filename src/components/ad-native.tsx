@@ -19,7 +19,7 @@ export function AdNative({ className }: { className?: string }) {
   }, []);
 
   return (
-    <div className={`flex flex-col items-center justify-center my-4 w-full ${className || ""}`}>
+    <div className={`hidden md:flex flex-col items-center justify-center my-4 w-full ${className || ""}`}>
       <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest mb-1">
         Ad
       </span>
