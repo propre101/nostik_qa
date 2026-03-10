@@ -2,6 +2,8 @@ import Link from "next/link";
 import { FreeQuestionForm } from "@/components/free-question-form";
 import { VipQuestionForm } from "@/components/vip-question-form";
 import { Separator } from "@/components/ui/separator";
+import { AdBanner } from "@/components/ad-banner";
+import { AdNative } from "@/components/ad-native";
 
 export default function HomePage() {
   return (
@@ -35,7 +37,24 @@ export default function HomePage() {
       </div>
 
       <div className="w-full space-y-6">
+        <AdBanner 
+          dataKey="f723923002e3ba1c56ccc6657991682d" 
+          format="iframe" 
+          height={90} 
+          width={728} 
+          className="hidden md:flex" 
+        />
+        <AdBanner 
+          dataKey="5d938f1c1125bd5f6c45b81fb9c59330" 
+          format="iframe" 
+          height={50} 
+          width={320} 
+          className="flex md:hidden" 
+        />
+
         <FreeQuestionForm />
+
+        <AdNative />
 
         <div className="flex items-center gap-4">
           <Separator className="flex-1" />

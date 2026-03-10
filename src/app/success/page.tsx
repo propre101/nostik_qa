@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { AdBanner } from "@/components/ad-banner";
+import { AdNative } from "@/components/ad-native";
 
 export default async function SuccessPage({
   searchParams,
@@ -11,8 +13,8 @@ export default async function SuccessPage({
   const isVip = params.vip === "true";
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
-      <Card className="max-w-md text-center">
+    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-8 space-y-8 w-full max-w-md mx-auto">
+      <Card className="w-full text-center">
         <CardContent className="space-y-4 pt-8 pb-8">
           <p className="text-5xl">{isVip ? "👑" : "🎉"}</p>
 
@@ -31,6 +33,15 @@ export default async function SuccessPage({
           </Button>
         </CardContent>
       </Card>
+
+      <AdBanner 
+        dataKey="215a567b5a5d6c1643cfb84062df1d56" 
+        format="iframe" 
+        height={250} 
+        width={300} 
+      />
+
+      <AdNative />
     </main>
   );
 }
