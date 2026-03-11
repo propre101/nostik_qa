@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Script from "next/script";
 import { FreeQuestionForm } from "@/components/free-question-form";
 import { VipQuestionForm } from "@/components/vip-question-form";
 import { Separator } from "@/components/ui/separator";
@@ -101,11 +100,6 @@ export default function HomePage() {
           </a>
         </p>
       </footer>
-
-      <Script 
-        strategy="afterInteractive"
-        src="https://authoritieswoundjoint.com/ee/0d/d2/ee0dd23f4dc86e351362acc0f3586bee.js"
-      />
     </main>
   );
 }
