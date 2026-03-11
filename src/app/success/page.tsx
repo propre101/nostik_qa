@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { AdBanner } from "@/components/ad-banner";
 import { AdNative } from "@/components/ad-native";
 
 export default async function SuccessPage({
@@ -33,13 +32,6 @@ export default async function SuccessPage({
           </Button>
         </CardContent>
       </Card>
-
-      <AdBanner
-        dataKey="215a567b5a5d6c1643cfb84062df1d56"
-        format="iframe"
-        height={250}
-        width={300}
-      />
 
       <AdNative />
     </main>
