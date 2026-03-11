@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Script from "next/script";
-import { AdblockDetector } from "@/components/adblock-detector";
 
 export function GlobalAds() {
   const pathname = usePathname();
@@ -21,9 +20,6 @@ export function GlobalAds() {
           strategy="afterInteractive" 
         />
       )}
-
-      {/* AdBlock Detector */}
-      <AdblockDetector />
     </>
   );
 }
