@@ -122,6 +122,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    color-scheme: dark;
+    forced-color-adjust: none;
   }
   button,
   [role="button"],
