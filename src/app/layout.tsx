@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   title: "Hicham Nostik Live — Q&A",
   description:
     "Ask your questions anonymously for Hicham Nostik Live. Free or VIP — your identity stays hidden.",
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({
