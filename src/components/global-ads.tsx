@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Script from "next/script";
-import { AdBanner } from "@/components/ad-banner";
 import { AdblockDetector } from "@/components/adblock-detector";
 
 export function GlobalAds() {
@@ -22,16 +21,6 @@ export function GlobalAds() {
           strategy="afterInteractive" 
         />
       )}
-      {/* Sticky Mobile Footer Ad */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center bg-background/80 backdrop-blur-sm border-t md:hidden">
-        <AdBanner 
-          dataKey="5d938f1c1125bd5f6c45b81fb9c59330" 
-          format="iframe" 
-          height={50} 
-          width={320} 
-          className="my-1" 
-        />
-      </div>
 
       {/* AdBlock Detector */}
       <AdblockDetector />

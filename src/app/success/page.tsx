@@ -34,11 +34,11 @@ export default async function SuccessPage({
         </CardContent>
       </Card>
 
-      <AdBanner 
-        dataKey="215a567b5a5d6c1643cfb84062df1d56" 
-        format="iframe" 
-        height={250} 
-        width={300} 
+      <AdBanner
+        dataKey="215a567b5a5d6c1643cfb84062df1d56"
+        format="iframe"
+        height={250}
+        width={300}
       />
 
       <AdNative />
