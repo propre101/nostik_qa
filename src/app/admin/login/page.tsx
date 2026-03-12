@@ -36,48 +36,50 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <p className="mb-1 text-3xl">🔐</p>
-          <CardTitle className="text-xl">Admin Login</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            🎙️ Hicham Nostik Live — Dashboard
-          </p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">📧 Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">🔑 Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            {error && (
-              <p className="text-sm text-destructive">❌ {error}</p>
-            )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "⏳ Signing in..." : "🚪 Sign In"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </main>
+    <div className="dark bg-background text-foreground min-h-screen">
+      <main className="flex min-h-screen items-center justify-center px-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader className="text-center">
+            <p className="mb-1 text-3xl">🔐</p>
+            <CardTitle className="text-xl">Admin Login</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              🎙️ Hicham Nostik Live — Dashboard
+            </p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">📧 Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">🔑 Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              {error && (
+                <p className="text-sm text-destructive">❌ {error}</p>
+              )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "⏳ Signing in..." : "🚪 Sign In"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
   );
 }

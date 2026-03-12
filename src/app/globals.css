@@ -116,12 +116,20 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.ngl-gradient {
+  background: #833AB4;
+  background: linear-gradient(120deg,rgba(131, 58, 180, 0.9) 0%, rgba(253, 29, 29, 0.9) 50%, rgba(252, 176, 69, 0.9) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    forced-color-adjust: none;
   }
   button,
   [role="button"],
