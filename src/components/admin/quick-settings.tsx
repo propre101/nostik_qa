@@ -78,7 +78,7 @@ export function QuickSettings({
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">Open Questions 💨</span>
+          <span className="text-sm text-muted-foreground">Questions 💨</span>
           <button
             onClick={handleToggle}
             disabled={toggleLoading}
