@@ -35,31 +35,33 @@ export default async function AdminDashboardPage({
   ]);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-muted-foreground/70">
-            Hicham Nostik Live — Question Manager
-          </p>
+    <div className="dark bg-background text-foreground min-h-screen">
+      <main className="mx-auto max-w-4xl px-4 py-8">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-sm text-muted-foreground/70">
+              Hicham Nostik Live — Question Manager
+            </p>
+          </div>
+          <LogoutButton />
         </div>
-        <LogoutButton />
-      </div>
 
-      <div className="space-y-5">
-        <StatsCards
-          total={stats.total}
-          pending={stats.pending}
-          answered={stats.answered}
-        />
-        <QuickSettings maxLength={maxLength} freeQuestionsOpen={freeQuestionsOpen} />
-        <QuestionFeed
-          questions={questions}
-          currentFilter={filter}
-          currentDateFilter={dateFilter}
-          currentTopicFilter={topicFilter}
-        />
-      </div>
-    </main>
+        <div className="space-y-5">
+          <StatsCards
+            total={stats.total}
+            pending={stats.pending}
+            answered={stats.answered}
+          />
+          <QuickSettings maxLength={maxLength} freeQuestionsOpen={freeQuestionsOpen} />
+          <QuestionFeed
+            questions={questions}
+            currentFilter={filter}
+            currentDateFilter={dateFilter}
+            currentTopicFilter={topicFilter}
+          />
+        </div>
+      </main>
+    </div>
   );
 }
