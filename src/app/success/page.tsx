@@ -56,12 +56,12 @@ export default async function SuccessPage({
         `}</style>
 
         {/* Ask Another Question button */}
-        <Link
+        <a
           href="/"
           className="mt-8 block w-full rounded-full bg-black py-4 text-center text-base font-bold text-white transition-all hover:bg-gray-800 animate-swing"
         >
           🔁 Ask Another Question
-        </Link>
+        </a>
 
         <div className="mt-6 w-full">
           <AdNative />
