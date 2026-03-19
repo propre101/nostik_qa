@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import { SupportSection } from "@/components/support-section";
 
 export default async function SuccessPage({
   searchParams,
@@ -63,7 +63,9 @@ export default async function SuccessPage({
           🔁 Ask Another Question
         </a>
 
-
+        <div className="w-full">
+          <SupportSection />
+        </div>
       </main>
     </div>
   );

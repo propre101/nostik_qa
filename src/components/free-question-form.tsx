@@ -160,17 +160,17 @@ export function FreeQuestionForm() {
 
       <form ref={formRef} action={handleSubmit} className="w-full">
         {/* NGL-style Card */}
-        <div className="relative overflow-hidden rounded-3xl shadow-xl" style={{ borderRadius: '24px' }}>
-          {!isOpen && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/80 backdrop-blur-sm" style={{ borderRadius: '24px' }}>
-              <span className="text-3xl">🔒</span>
-              <p className="max-w-xs text-center text-sm font-medium text-gray-500">
+        <div className="relative overflow-hidden rounded-[32px] shadow-2xl">
+          {!isOpen ? (
+            <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 min-h-[300px] bg-white/90 backdrop-blur-md">
+              <span className="text-5xl">🔒</span>
+              <p className="max-w-xs text-center text-[15px] font-medium text-gray-700">
                 Questions are closed for now — Nostik will open them when the live starts!
               </p>
             </div>
-          )}
-
-          {/* White header section */}
+          ) : (
+            <>
+              {/* White header section */}
           <div className="flex items-center gap-3 bg-white px-5 py-4">
             <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full border-2 border-gray-100">
               <Image
@@ -191,7 +191,7 @@ export function FreeQuestionForm() {
           <div className="relative" style={{ backgroundColor: 'rgba(255, 240, 238, 0.65)' }}>
             <textarea
               name="content"
-              placeholder="Type your anonymous question here... 🤫"
+              placeholder="Type your question here... 🤫"
               value={content}
               maxLength={maxLength}
               rows={4}
@@ -271,22 +271,34 @@ export function FreeQuestionForm() {
               </div>
             )}
           </div>
-        </div>
+        </>
+      )}
+    </div>
 
 
 
-        {error && (
-          <p className="mt-3 text-center text-sm font-medium text-white/90">⚠️ {error}</p>
+        {isOpen && (
+          <>
+            {error && (
+              <p className="mt-3 text-center text-sm font-medium text-white/90">⚠️ {error}</p>
+            )}
+
+            <p className="mt-4 text-center text-[13px] font-medium text-white/90">
+              🔒 Your privacy is guaranteed. We collect no personal data whatsoever.
+            </p>
+
+            <div className="mt-5 flex justify-center">
+              <button
+                type="submit"
+                disabled={pending}
+                className="w-[90%] rounded-full bg-black py-4 text-base font-bold text-white transition-all hover:bg-gray-800 disabled:opacity-40"
+                style={{ borderRadius: '9999px' }}
+              >
+                {pending ? "⏳ Sending..." : "Send!"}
+              </button>
+            </div>
+          </>
         )}
-
-        <button
-          type="submit"
-          disabled={pending}
-          className="mt-5 w-full rounded-full bg-black py-4 text-base font-bold text-white transition-all hover:bg-gray-800 disabled:opacity-40"
-          style={{ borderRadius: '9999px' }}
-        >
-          {pending ? "⏳ Sending..." : "Send!"}
-        </button>
       </form>
       {/* Captcha Modal */}
       {showCaptcha && (

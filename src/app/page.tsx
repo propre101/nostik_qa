@@ -1,40 +1,19 @@
 import Link from "next/link";
 import { FreeQuestionForm } from "@/components/free-question-form";
+import { SupportSection } from "@/components/support-section";
 
 
 export default function HomePage() {
   return (
     <div className="ngl-gradient min-h-screen">
-      <main className="mx-auto flex max-w-xl flex-col items-center px-4 py-10">
+      <main className="mx-auto flex max-w-xl flex-col items-center px-4 pt-10 pb-24">
         <div className="w-full space-y-6">
           <FreeQuestionForm />
-
-
+          <SupportSection />
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <a
-            href="https://github.com/sponsors/propre101"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/30"
-          >
-            💖 Sponsor
-          </a>
-          <a
-            href="https://github.com/propre101/nostik_qa"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/30"
-          >
-            ⭐ GitHub
-          </a>
-        </div>
 
         <footer className="mt-6 space-y-2 text-center text-xs text-white/80">
-          <p>
-            🔒 Your privacy is guaranteed. We collect no personal data whatsoever.
-          </p>
           <p>
             Developed with ❤️ by{" "}
             <a
@@ -62,9 +41,9 @@ export default function HomePage() {
               rel="noopener noreferrer"
               className="underline underline-offset-2 hover:text-white"
             >
-              🐙 GitHub
+              ⭐ Star on GitHub
             </a>
-            {" · "}
+            {/* {" · "}
             <a
               href="https://github.com/sponsors/propre101"
               target="_blank"
@@ -72,7 +51,7 @@ export default function HomePage() {
               className="underline underline-offset-2 hover:text-white"
             >
               💜 Sponsor
-            </a>
+            </a> */}
           </p>
         </footer>
       </main>
