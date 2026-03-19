@@ -101,7 +101,7 @@ export async function updateMaxLength(newLength: number) {
 const VALID_TOPICS = ["love", "career", "depression", "random", "other"];
 const VALID_GENDERS = ["male", "female", "other"];
 
-async function verifyTurnstile(token: string): Promise<boolean> {
+export async function verifyTurnstile(token: string): Promise<boolean> {
   const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },

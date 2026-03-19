@@ -7,18 +7,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Turnstile } from "@/components/turnstile";
+import { verifyTurnstile } from "@/lib/actions";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
   const router = useRouter();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    if (!captchaToken) {
+      setError("Please complete the security check.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
+
+    // Verify Turnstile token on the server
+    const isValid = await verifyTurnstile(captchaToken);
+    if (!isValid) {
+      setError("CAPTCHA verification failed. Please try again.");
+      setLoading(false);
+      return;
+    }
 
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
@@ -70,6 +86,16 @@ export default function AdminLoginPage() {
                   required
                 />
               </div>
+
+              <div className="flex justify-center pt-2 min-h-[65px]">
+                <Turnstile
+                  onVerify={(token) => {
+                    setCaptchaToken(token);
+                  }}
+                  onExpire={() => setCaptchaToken("")}
+                />
+              </div>
+
               {error && (
                 <p className="text-sm text-destructive">❌ {error}</p>
               )}

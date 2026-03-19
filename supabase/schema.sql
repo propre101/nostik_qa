@@ -7,6 +7,8 @@
 create table if not exists public.questions (
   id          uuid primary key default gen_random_uuid(),
   content     text not null,
+  topic       text not null default 'other',
+  gender      text not null default 'other',
   is_vip      boolean not null default false,
   status      text not null default 'unread' check (status in ('unread', 'read', 'answered')),
   created_at  timestamptz not null default now()
