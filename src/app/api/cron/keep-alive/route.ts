@@ -14,7 +14,8 @@ export async function GET(request: Request) {
   )
 
   // A simple query to wake up the DB
-  const { data, error } = await supabase.from('_keep_alive').select('*').limit(1)
+    const { data, error } = await supabase.from('settings').select('key').limit(1)
+
 
   if (error && error.code !== 'PGRST116') {
      // If the table doesn't exist, we still successfully "hit" the DB, 
