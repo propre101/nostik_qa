@@ -2,41 +2,70 @@
 
 import { createServerSupabase, createAnonSupabase, createServiceRoleSupabase } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 const DEFAULT_MAX_LENGTH = 250;
 
-export async function getFreeQuestionsOpen(): Promise<boolean> {
+export async function getActiveSession() {
   const supabase = createAnonSupabase();
   const { data } = await supabase
-    .from("settings")
-    .select("value")
-    .eq("key", "free_questions_open")
+    .from("sessions")
+    .select("*")
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .single();
 
-  return data?.value !== "false";
+  return data;
 }
 
-export async function toggleFreeQuestions(open: boolean) {
+export async function getSessions() {
   const supabase = await createServerSupabase();
-  const { data: existing } = await supabase
-    .from("settings")
-    .select("key")
-    .eq("key", "free_questions_open")
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Failed to fetch sessions:", error);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function createSession(title: string, description: string = "") {
+  if (!title || title.trim().length === 0) return { error: "Title is required" };
+
+  const supabase = await createServerSupabase();
+  
+  // Close any existing active sessions
+  await supabase
+    .from("sessions")
+    .update({ is_active: false, closed_at: new Date().toISOString() })
+    .eq("is_active", true);
+
+  const { data, error } = await supabase
+    .from("sessions")
+    .insert({ title, description, is_active: true })
+    .select()
     .single();
 
-  if (existing) {
-    const { error } = await supabase
-      .from("settings")
-      .update({ value: String(open) })
-      .eq("key", "free_questions_open");
-    if (error) return { error: "Failed to update setting." };
-  } else {
-    const { error } = await supabase
-      .from("settings")
-      .insert({ key: "free_questions_open", value: String(open) });
-    if (error) return { error: "Failed to create setting." };
-  }
+  if (error) return { error: "Failed to create session." };
+  
+  revalidatePath("/admin/dashboard");
+  return { error: null, session: data };
+}
 
+export async function endSession(id: string) {
+  const supabase = await createServerSupabase();
+  const { error } = await supabase
+    .from("sessions")
+    .update({ is_active: false, closed_at: new Date().toISOString() })
+    .eq("id", id);
+    
+  if (error) return { error: "Failed to end session." };
+  
+  revalidatePath("/admin/dashboard");
   return { error: null };
 }
 
@@ -86,9 +115,9 @@ async function verifyTurnstile(token: string): Promise<boolean> {
 }
 
 export async function submitFreeQuestion(formData: FormData) {
-  const isOpen = await getFreeQuestionsOpen();
-  if (!isOpen) {
-    return { error: "Free questions are currently closed." };
+  const activeSession = await getActiveSession();
+  if (!activeSession) {
+    return { error: "No live session right now — come back later! 🎙️" };
   }
 
   const turnstileToken = formData.get("cf-turnstile-response") as string | null;
@@ -124,6 +153,7 @@ export async function submitFreeQuestion(formData: FormData) {
     topic,
     gender,
     is_vip: false,
+    session_id: activeSession.id,
   });
 
   if (error) {
@@ -153,6 +183,7 @@ export async function submitVipQuestion(content: string) {
 }
 
 export async function getQuestions(
+  sessionId?: string,
   filter?: string,
   dateFilter?: string,
   topicFilter?: string,
@@ -164,6 +195,10 @@ export async function getQuestions(
     .from("questions")
     .select("*")
     .order("created_at", { ascending: true });
+
+  if (sessionId) {
+    query = query.eq("session_id", sessionId);
+  }
 
   if (filter === "answered") {
     query = query.eq("status", "answered");
@@ -207,12 +242,18 @@ export async function getQuestions(
   return { data: data ?? [], error: null };
 }
 
-export async function getStats() {
+export async function getStats(sessionId?: string) {
   const supabase = await createServerSupabase();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("questions")
     .select("is_vip, status");
+    
+  if (sessionId) {
+    query = query.eq("session_id", sessionId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return { total: 0, free: 0, vip: 0, pending: 0, answered: 0, revenue: 0 };
@@ -255,5 +296,26 @@ export async function deleteQuestion(id: string) {
     return { error: "Failed to delete question." };
   }
 
+  return { error: null };
+}
+
+export async function deleteSession(id: string) {
+  const supabase = await createServerSupabase();
+
+  const { error: qError } = await supabase
+    .from("questions")
+    .delete()
+    .eq("session_id", id);
+    
+  if (qError) return { error: "Failed to delete session questions." };
+
+  const { error } = await supabase
+    .from("sessions")
+    .delete()
+    .eq("id", id);
+
+  if (error) return { error: "Failed to delete session." };
+  
+  revalidatePath("/admin/dashboard");
   return { error: null };
 }

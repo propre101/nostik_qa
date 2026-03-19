@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { submitFreeQuestion, getMaxLength, getFreeQuestionsOpen } from "@/lib/actions";
+import { submitFreeQuestion, getMaxLength, getActiveSession } from "@/lib/actions";
 import { Turnstile } from "@/components/turnstile";
 
 const TOPICS = [
@@ -40,7 +40,7 @@ export function FreeQuestionForm() {
 
   useEffect(() => {
     getMaxLength().then(setMaxLength);
-    getFreeQuestionsOpen().then(setIsOpen);
+    getActiveSession().then((session) => setIsOpen(!!session));
   }, []);
 
   function handleGenderSelect(value: string) {
@@ -163,9 +163,9 @@ export function FreeQuestionForm() {
         <div className="relative overflow-hidden rounded-[32px] shadow-2xl">
           {!isOpen ? (
             <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 min-h-[300px] bg-white/90 backdrop-blur-md">
-              <span className="text-5xl">🔒</span>
+              <span className="text-5xl">🎙️</span>
               <p className="max-w-xs text-center text-[15px] font-medium text-gray-700">
-                Questions are closed for now — Nostik will open them when the live starts!
+                No live session right now — come back later!
               </p>
             </div>
           ) : (

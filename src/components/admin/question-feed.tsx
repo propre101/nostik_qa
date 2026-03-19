@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { QuestionCard } from "./question-card";
 
 interface Question {
@@ -18,11 +19,6 @@ const STATUS_FILTERS = [
   { value: "answered", label: "Answered" },
 ];
 
-const DATE_FILTERS = [
-  { value: "today", label: "Today" },
-  { value: "yesterday", label: "Yesterday" },
-  { value: "all", label: "All time" },
-];
 
 const TOPIC_FILTERS = [
   { value: "all", label: "All" },
@@ -58,13 +54,13 @@ function Chip({
 
 export function QuestionFeed({
   questions,
+  isActive,
   currentFilter,
-  currentDateFilter,
   currentTopicFilter,
 }: {
   questions: Question[];
+  isActive: boolean;
   currentFilter: string;
-  currentDateFilter: string;
   currentTopicFilter: string;
 }) {
   const router = useRouter();
@@ -87,8 +83,25 @@ export function QuestionFeed({
     router.push(`/admin/dashboard${qs ? `?${qs}` : ""}`);
   }
 
+  useEffect(() => {
+    if (!isActive) return;
+    const interval = setInterval(() => {
+      router.refresh();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [isActive, router]);
+
   return (
     <div className="space-y-4">
+      {isActive && (
+        <div className="flex items-center gap-2 px-1">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span className="text-xs font-semibold text-emerald-500 tracking-wide uppercase">Live — auto-refreshing</span>
+        </div>
+      )}
       <div className="rounded-xl border border-border/30 bg-card/40 p-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-1">
@@ -100,19 +113,6 @@ export function QuestionFeed({
                 key={f.value}
                 active={currentFilter === f.value}
                 onClick={() => navigate({ filter: f.value })}
-              >
-                {f.label}
-              </Chip>
-            ))}
-            <span className="mx-2 h-4 w-px bg-border/40" />
-            <span className="mr-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/50">
-              Date
-            </span>
-            {DATE_FILTERS.map((f) => (
-              <Chip
-                key={f.value}
-                active={currentDateFilter === f.value}
-                onClick={() => navigate({ date: f.value })}
               >
                 {f.label}
               </Chip>

@@ -4,14 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { updateMaxLength, toggleFreeQuestions } from "@/lib/actions";
+import { updateMaxLength } from "@/lib/actions";
 
 export function QuickSettings({
   maxLength,
-  freeQuestionsOpen,
 }: {
   maxLength: number;
-  freeQuestionsOpen: boolean;
 }) {
   const router = useRouter();
 
@@ -20,8 +18,6 @@ export function QuickSettings({
   const [charMsg, setCharMsg] = useState<string | null>(null);
   const charChanged = Number(charValue) !== maxLength;
 
-  const [open, setOpen] = useState(freeQuestionsOpen);
-  const [toggleLoading, setToggleLoading] = useState(false);
 
   async function handleSaveChars() {
     const num = parseInt(charValue, 10);
@@ -38,13 +34,6 @@ export function QuickSettings({
     setTimeout(() => setCharMsg(null), 2000);
   }
 
-  async function handleToggle() {
-    setToggleLoading(true);
-    const result = await toggleFreeQuestions(!open);
-    if (!result.error) setOpen(!open);
-    setToggleLoading(false);
-    router.refresh();
-  }
 
   return (
     <div className="rounded-xl border border-border/30 bg-card/40 p-4">
@@ -75,30 +64,6 @@ export function QuickSettings({
           {charMsg && (
             <span className="text-xs text-muted-foreground">{charMsg}</span>
           )}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">Free Questions</span>
-          <button
-            onClick={handleToggle}
-            disabled={toggleLoading}
-            className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
-              open ? "bg-emerald-500" : "bg-muted"
-            }`}
-          >
-            <span
-              className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-                open ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </button>
-          <span
-            className={`text-xs font-semibold ${
-              open ? "text-emerald-400" : "text-red-400"
-            }`}
-          >
-            {open ? "Open" : "Closed"}
-          </span>
         </div>
       </div>
     </div>
