@@ -120,7 +120,7 @@
   background: #C724B1;
   background: linear-gradient(to bottom left, #38B6FF 0%, #C724B1 100%);
   background-attachment: fixed;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 @layer base {
