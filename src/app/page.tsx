@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FreeQuestionForm } from "@/components/free-question-form";
-import { AdNative } from "@/components/ad-native";
+
 
 export default function HomePage() {
   return (
@@ -9,7 +9,7 @@ export default function HomePage() {
         <div className="w-full space-y-6">
           <FreeQuestionForm />
 
-          <AdNative />
+
         </div>
 
         <div className="mt-8 flex items-center justify-center gap-3">

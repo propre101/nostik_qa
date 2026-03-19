@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AdNative } from "@/components/ad-native";
+
 
 export default async function SuccessPage({
   searchParams,
@@ -63,9 +63,7 @@ export default async function SuccessPage({
           🔁 Ask Another Question
         </a>
 
-        <div className="mt-6 w-full">
-          <AdNative />
-        </div>
+
       </main>
     </div>
   );

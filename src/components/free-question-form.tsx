@@ -34,7 +34,9 @@ export function FreeQuestionForm() {
   const [step, setStep] = useState<Step>("gender");
   const [animating, setAnimating] = useState(false);
   const [animDir, setAnimDir] = useState<"forward" | "back">("forward");
+  const [showCaptcha, setShowCaptcha] = useState(false);
   const chipRowRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     getMaxLength().then(setMaxLength);
@@ -70,7 +72,7 @@ export function FreeQuestionForm() {
       return;
     }
     if (!captchaToken) {
-      setError("Please complete the CAPTCHA verification.");
+      setShowCaptcha(true);
       return;
     }
     setPending(true);
@@ -156,7 +158,7 @@ export function FreeQuestionForm() {
         }
       `}</style>
 
-      <form action={handleSubmit} className="w-full">
+      <form ref={formRef} action={handleSubmit} className="w-full">
         {/* NGL-style Card */}
         <div className="relative overflow-hidden rounded-3xl shadow-xl" style={{ borderRadius: '24px' }}>
           {!isOpen && (
@@ -271,13 +273,7 @@ export function FreeQuestionForm() {
           </div>
         </div>
 
-        {/* Captcha + Error + Submit — outside the card */}
-        <div className="mt-5 flex justify-center">
-          <Turnstile
-            onVerify={(token) => setCaptchaToken(token)}
-            onExpire={() => setCaptchaToken("")}
-          />
-        </div>
+
 
         {error && (
           <p className="mt-3 text-center text-sm font-medium text-white/90">⚠️ {error}</p>
@@ -285,13 +281,48 @@ export function FreeQuestionForm() {
 
         <button
           type="submit"
-          disabled={pending || !captchaToken}
-          className="mt-5 w-full rounded-full bg-black py-4 text-base font-bold text-white transition-all hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={pending}
+          className="mt-5 w-full rounded-full bg-black py-4 text-base font-bold text-white transition-all hover:bg-gray-800 disabled:opacity-40"
           style={{ borderRadius: '9999px' }}
         >
           {pending ? "⏳ Sending..." : "Send!"}
         </button>
       </form>
+      {/* Captcha Modal */}
+      {showCaptcha && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-[32px] bg-white p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="mb-6 text-center">
+              <h3 className="text-xl font-bold text-gray-900">Security Check</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Please verify you're human to send your question.
+              </p>
+            </div>
+            
+            <div className="flex justify-center min-h-[65px]">
+              <Turnstile
+                onVerify={(token) => {
+                  setCaptchaToken(token);
+                  setShowCaptcha(false);
+                  // Use a small timeout to ensure state updates before re-submitting
+                  setTimeout(() => {
+                    formRef.current?.requestSubmit();
+                  }, 100);
+                }}
+                onExpire={() => setCaptchaToken("")}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowCaptcha(false)}
+              className="mt-6 w-full text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

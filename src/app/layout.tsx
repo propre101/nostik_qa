@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "@/components/session-provider";
-import { GlobalAds } from "@/components/global-ads";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,7 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased pb-20 md:pb-0 relative min-h-screen`}
       >
         <SessionProvider>{children}</SessionProvider>
-        <GlobalAds />
+
       </body>
     </html>
   );
