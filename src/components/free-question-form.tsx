@@ -29,7 +29,8 @@ export function FreeQuestionForm() {
   const [topic, setTopic] = useState("");
   const [gender, setGender] = useState("");
   const [content, setContent] = useState("");
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [captchaToken, setCaptchaToken] = useState("");
   const [step, setStep] = useState<Step>("gender");
   const [animating, setAnimating] = useState(false);
@@ -40,7 +41,10 @@ export function FreeQuestionForm() {
 
   useEffect(() => {
     getMaxLength().then(setMaxLength);
-    getActiveSession().then((session) => setIsOpen(!!session));
+    getActiveSession().then((session) => {
+      setIsOpen(!!session);
+      setIsLoading(false);
+    });
   }, []);
 
   function handleGenderSelect(value: string) {
@@ -160,8 +164,15 @@ export function FreeQuestionForm() {
 
       <form ref={formRef} action={handleSubmit} className="w-full">
         {/* NGL-style Card */}
-        <div className="relative overflow-hidden rounded-[32px] shadow-2xl">
-          {!isOpen ? (
+        {isLoading ? (
+          <div className="relative overflow-hidden rounded-[32px] shadow-2xl bg-white/40 backdrop-blur-md flex flex-col items-center justify-center gap-5 px-6 py-16 min-h-[300px] animate-pulse">
+            <div className="h-16 w-16 rounded-full bg-white/20" />
+            <div className="h-4 w-1/2 max-w-[200px] rounded-full bg-white/20" />
+            <div className="h-3 w-1/3 max-w-[120px] rounded-full bg-white/20" />
+          </div>
+        ) : (
+          <div className="relative overflow-hidden rounded-[32px] shadow-2xl">
+            {!isOpen ? (
             <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 min-h-[300px] bg-white/90 backdrop-blur-md">
               <span className="text-5xl">🎙️</span>
               <p className="max-w-xs text-center text-[15px] font-medium text-gray-700">
@@ -274,10 +285,11 @@ export function FreeQuestionForm() {
         </>
       )}
     </div>
+        )}
 
 
 
-        {isOpen && (
+        {isOpen && !isLoading && (
           <>
             {error && (
               <p className="mt-3 text-center text-sm font-medium text-white/90">⚠️ {error}</p>
