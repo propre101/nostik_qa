@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { updateMaxLength, createSession, deleteSession, getNextPendingQuestion, getPendingCount, deleteQuestion, getSessionEndTime, updateSessionEndTime } from "@/lib/actions";
+import { updateMaxLength, createSession, deleteSession, getNextPendingQuestion, getPendingCount, deleteQuestion, getSessionEndTime, updateSessionEndTime, checkIdleSession } from "@/lib/actions";
 import { LogoutButton } from "@/components/admin/logout-button";
 import { Heart, Briefcase, Activity, Dices, MessageCircle, User } from "lucide-react";
 
@@ -34,6 +34,12 @@ export function LiveDashboard({
       if (isFetching || isAnswering) return;
       isFetching = true;
       try {
+        const isIdle = await checkIdleSession(activeSessionId);
+        if (isIdle) {
+          await handleStop();
+          return;
+        }
+
         const count = await getPendingCount(activeSessionId);
         setPendingCount(count);
 

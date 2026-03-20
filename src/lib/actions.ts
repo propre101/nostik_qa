@@ -373,3 +373,35 @@ export async function getPendingCount(sessionId: string): Promise<number> {
   if (error) return 0;
   return count ?? 0;
 }
+
+export async function checkIdleSession(sessionId: string): Promise<boolean> {
+  const supabase = await createServerSupabase();
+  
+  const { data: qData } = await supabase
+    .from("questions")
+    .select("created_at")
+    .eq("session_id", sessionId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  let lastActivityAt = qData?.created_at;
+
+  if (!lastActivityAt) {
+    const { data: sData } = await supabase
+      .from("sessions")
+      .select("created_at")
+      .eq("id", sessionId)
+      .single();
+    if (sData) lastActivityAt = sData.created_at;
+  }
+
+  if (lastActivityAt) {
+    const lastTime = new Date(lastActivityAt).getTime();
+    const now = Date.now();
+    if (now - lastTime > 60 * 60 * 1000) {
+      return true;
+    }
+  }
+  return false;
+}
