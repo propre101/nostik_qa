@@ -23,14 +23,17 @@ export async function getSessions() {
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from("sessions")
-    .select("*")
+    .select("*, questions(count)")
     .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Failed to fetch sessions:", error);
     return [];
   }
-  return data ?? [];
+  return (data ?? []).map((s: any) => ({
+    ...s,
+    question_count: s.questions?.[0]?.count ?? 0,
+  }));
 }
 
 export async function createSession(title: string, description: string = "") {
@@ -96,6 +99,30 @@ export async function updateMaxLength(newLength: number) {
   }
 
   return { error: null };
+}
+
+export async function getSessionEndTime(): Promise<number | null> {
+  const supabase = createAnonSupabase();
+  const { data } = await supabase
+    .from("settings")
+    .select("value")
+    .eq("key", "session_end")
+    .single();
+
+  return data?.value ? parseInt(data.value, 10) : null;
+}
+
+export async function updateSessionEndTime(timeMs: number | null) {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const adminSupabase = await createServiceRoleSupabase();
+  if (timeMs === null) {
+    await adminSupabase.from("settings").delete().eq("key", "session_end");
+  } else {
+    await adminSupabase.from("settings").upsert({ key: "session_end", value: String(timeMs) });
+  }
 }
 
 const VALID_TOPICS = ["love", "career", "depression", "random", "other"];
@@ -318,4 +345,31 @@ export async function deleteSession(id: string) {
   
   revalidatePath("/admin/dashboard");
   return { error: null };
+}
+
+export async function getNextPendingQuestion(sessionId: string) {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from("questions")
+    .select("*")
+    .eq("session_id", sessionId)
+    .neq("status", "answered")
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+export async function getPendingCount(sessionId: string): Promise<number> {
+  const supabase = await createServerSupabase();
+  const { count, error } = await supabase
+    .from("questions")
+    .select("*", { count: "exact", head: true })
+    .eq("session_id", sessionId)
+    .neq("status", "answered");
+
+  if (error) return 0;
+  return count ?? 0;
 }
