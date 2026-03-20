@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { submitFreeQuestion, getMaxLength, getFreeQuestionsOpen } from "@/lib/actions";
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { submitFreeQuestion, getMaxLength, getActiveSession } from "@/lib/actions";
 import { Turnstile } from "@/components/turnstile";
 
 const TOPICS = [
@@ -21,6 +19,8 @@ const GENDERS = [
   { value: "other", label: "👤 Other" },
 ];
 
+type Step = "gender" | "topic";
+
 export function FreeQuestionForm() {
   const [charCount, setCharCount] = useState(0);
   const [maxLength, setMaxLength] = useState(250);
@@ -29,25 +29,54 @@ export function FreeQuestionForm() {
   const [topic, setTopic] = useState("");
   const [gender, setGender] = useState("");
   const [content, setContent] = useState("");
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [captchaToken, setCaptchaToken] = useState("");
+  const [step, setStep] = useState<Step>("gender");
+  const [animating, setAnimating] = useState(false);
+  const [animDir, setAnimDir] = useState<"forward" | "back">("forward");
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const chipRowRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     getMaxLength().then(setMaxLength);
-    getFreeQuestionsOpen().then(setIsOpen);
+    getActiveSession().then((session) => {
+      setIsOpen(!!session);
+      setIsLoading(false);
+    });
   }, []);
 
+  function handleGenderSelect(value: string) {
+    setGender(value);
+    setAnimDir("forward");
+    setAnimating(true);
+    setTimeout(() => {
+      setStep("topic");
+      setAnimating(false);
+    }, 300);
+  }
+
+  function handleBackToGender() {
+    setAnimDir("back");
+    setAnimating(true);
+    setTimeout(() => {
+      setStep("gender");
+      setAnimating(false);
+    }, 300);
+  }
+
   async function handleSubmit(formData: FormData) {
+    if (!gender) {
+      setError("Please select who you are.");
+      return;
+    }
     if (!topic) {
       setError("Please select a topic.");
       return;
     }
-    if (!gender) {
-      setError("Please select a gender.");
-      return;
-    }
     if (!captchaToken) {
-      setError("Please complete the CAPTCHA verification.");
+      setShowCaptcha(true);
       return;
     }
     setPending(true);
@@ -63,72 +92,117 @@ export function FreeQuestionForm() {
     }
   }
 
+  // Animation classes
+  const getSlideClass = () => {
+    if (!animating) return "ngl-chip-visible";
+    return animDir === "forward" ? "ngl-chip-exit-left" : "ngl-chip-exit-right";
+  };
+
+  const getEnterClass = () => {
+    if (animating) return "ngl-chip-hidden";
+    return step === "topic" && animDir === "forward"
+      ? "ngl-chip-enter-right"
+      : step === "gender" && animDir === "back"
+        ? "ngl-chip-enter-left"
+        : "ngl-chip-visible";
+  };
+
   return (
-    <Card className="relative overflow-hidden border-border/50">
-      {!isOpen && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-background/80 backdrop-blur-sm">
-          <span className="text-3xl">🔒</span>
-          <p className="max-w-xs text-center text-sm font-medium text-muted-foreground">
-            Questions are closed for now — Nostik will open them when the live starts!
-          </p>
-        </div>
-      )}
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
-          💬 Free Question (صحاب لعجاجة)
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          ✏️ Ask anything — limited to {maxLength} characters.
-        </p>
-      </CardHeader>
-      <CardContent>
-        <form action={handleSubmit} className="space-y-5">
-          <fieldset className="space-y-2.5">
-            <legend className="text-sm font-medium text-foreground">Topic</legend>
-            <div className="flex flex-wrap gap-2">
-              {TOPICS.map((t) => (
-                <button
-                  key={t.value}
-                  type="button"
-                  onClick={() => setTopic(t.value)}
-                  className={`rounded-lg border px-3.5 py-2 text-sm font-medium transition-all ${
-                    topic === t.value
-                      ? "border-amber-500 bg-amber-500/15 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.15)]"
-                      : "border-border/60 text-muted-foreground hover:border-amber-500/40 hover:text-foreground"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </fieldset>
+    <>
+      {/* Inline animation styles */}
+      <style>{`
+        .ngl-chip-row {
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ngl-chip-visible {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        .ngl-chip-exit-left {
+          transform: translateX(-100%);
+          opacity: 0;
+        }
+        .ngl-chip-exit-right {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        .ngl-chip-enter-right {
+          animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .ngl-chip-enter-left {
+          animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes slideInRight {
+          from { transform: translateX(40px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInLeft {
+          from { transform: translateX(-40px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .ngl-chip-hidden {
+          opacity: 0;
+          pointer-events: none;
+          position: absolute;
+        }
+        .ngl-domino-chip {
+          box-shadow: 0 3px 0 #c0c0c0;
+          transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+        }
+        .ngl-domino-chip:active {
+          transform: translateY(2px);
+          box-shadow: 0 1px 0 #c0c0c0;
+        }
+        .ngl-domino-chip-selected {
+          box-shadow: 0 3px 0 #000;
+        }
+        .ngl-domino-chip-selected:active {
+          transform: translateY(2px);
+          box-shadow: 0 1px 0 #000;
+        }
+      `}</style>
 
-          <fieldset className="space-y-2.5">
-            <legend className="text-sm font-medium text-foreground">I am</legend>
-            <div className="inline-flex overflow-hidden rounded-lg border border-border/60">
-              {GENDERS.map((g, i) => (
-                <button
-                  key={g.value}
-                  type="button"
-                  onClick={() => setGender(g.value)}
-                  className={`px-5 py-2 text-sm font-medium transition-all ${
-                    i > 0 ? "border-l border-border/60" : ""
-                  } ${
-                    gender === g.value
-                      ? "bg-amber-500/15 text-amber-400"
-                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  }`}
-                >
-                  {g.label}
-                </button>
-              ))}
+      <form ref={formRef} action={handleSubmit} className="w-full">
+        {/* NGL-style Card */}
+        {isLoading ? (
+          <div className="relative overflow-hidden rounded-[32px] shadow-2xl bg-white/40 backdrop-blur-md flex flex-col items-center justify-center gap-5 px-6 py-16 min-h-[300px] animate-pulse">
+            <div className="h-16 w-16 rounded-full bg-white/20" />
+            <div className="h-4 w-1/2 max-w-[200px] rounded-full bg-white/20" />
+            <div className="h-3 w-1/3 max-w-[120px] rounded-full bg-white/20" />
+          </div>
+        ) : (
+          <div className="relative overflow-hidden rounded-[32px] shadow-2xl">
+            {!isOpen ? (
+            <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 min-h-[300px] bg-white/90 backdrop-blur-md">
+              <span className="text-5xl">🎙️</span>
+              <p className="max-w-xs text-center text-[15px] font-medium text-gray-700">
+                No live session right now — come back later!
+              </p>
             </div>
-          </fieldset>
+          ) : (
+            <>
+              {/* White header section */}
+          <div className="flex items-center gap-3 bg-white px-5 py-4">
+            <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full border-2 border-gray-100">
+              <Image
+                src="/favicon.ico"
+                alt="Hicham Nostik"
+                width={44}
+                height={44}
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[15px] font-bold text-gray-900 leading-tight">@hicham_nostik</p>
+              <p className="text-[13px] text-gray-500 leading-tight">send me anonymous questions!</p>
+            </div>
+          </div>
 
-          <div className="relative">
-            <Textarea
+          {/* Pinkish textarea section */}
+          <div className="relative" style={{ backgroundColor: 'rgba(255, 240, 238, 0.65)' }}>
+            <textarea
               name="content"
-              placeholder="Type your anonymous question here... 🤔"
+              placeholder="Type your question here... 🤫"
               value={content}
               maxLength={maxLength}
               rows={4}
@@ -138,26 +212,141 @@ export function FreeQuestionForm() {
                 setContent(v);
                 setCharCount(v.length);
               }}
-              className="resize-none"
+              className="w-full resize-none border-none bg-transparent px-5 py-4 text-[15px] font-semibold outline-none" style={{ color: '#2d2d2d', '--tw-placeholder-opacity': '1' } as React.CSSProperties}
             />
-            <span className="absolute bottom-2 right-3 text-xs text-muted-foreground">
+            {/* Placeholder color override */}
+            <style>{`
+              form textarea::placeholder { color: rgba(0,0,0,0.4); }
+            `}</style>
+            <span className="absolute bottom-2 right-4 text-[11px]" style={{ color: 'rgba(0,0,0,0.35)' }}>
               {charCount}/{maxLength}
             </span>
           </div>
-          <div className="flex justify-center">
-            <Turnstile
-              onVerify={(token) => setCaptchaToken(token)}
-              onExpire={() => setCaptchaToken("")}
-            />
+
+          {/* Two-step chip selector */}
+          <div
+            ref={chipRowRef}
+            className="relative overflow-hidden px-4 py-3"
+            style={{ backgroundColor: 'rgba(255, 235, 232, 0.65)', minHeight: '58px' }}
+          >
+            {/* Step 1: Gender */}
+            {step === "gender" && (
+              <div className={`ngl-chip-row ${animating ? getSlideClass() : "ngl-chip-visible"}`}>
+                <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wider" style={{ color: 'rgba(0,0,0,0.5)' }}>I am...</p>
+                <div className="flex gap-2">
+                  {GENDERS.map((g) => (
+                    <button
+                      key={g.value}
+                      type="button"
+                      onClick={() => handleGenderSelect(g.value)}
+                      className={`ngl-domino-chip rounded-full px-4 py-1.5 text-xs font-medium ${gender === g.value
+                          ? "ngl-domino-chip-selected bg-black text-white"
+                          : "bg-white/70 hover:bg-white" + " " + "text-[#2d2d2d]"
+                        }`}
+                    >
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Topic */}
+            {step === "topic" && (
+              <div className={`ngl-chip-row ${animating ? "ngl-chip-hidden" : getEnterClass()}`}>
+                <div className="mb-1.5 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleBackToGender}
+                    className="text-[11px] font-semibold transition-colors" style={{ color: 'rgba(0,0,0,0.5)' }}
+                  >
+                    ← change
+                  </button>
+                  <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'rgba(0,0,0,0.5)' }}>Topic...</p>
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                  {TOPICS.map((t) => (
+                    <button
+                      key={t.value}
+                      type="button"
+                      onClick={() => setTopic(t.value)}
+                      className={`ngl-domino-chip flex-shrink-0 rounded-full px-4 py-1.5 text-xs font-medium ${topic === t.value
+                          ? "ngl-domino-chip-selected bg-black text-white"
+                          : "bg-white/70 hover:bg-white" + " " + "text-[#2d2d2d]"
+                        }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-          {error && (
-            <p className="text-sm text-destructive">⚠️ {error}</p>
-          )}
-          <Button type="submit" className="w-full" disabled={pending || !captchaToken}>
-            {pending ? "⏳ Submitting..." : "🚀 Submit Question"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </>
+      )}
+    </div>
+        )}
+
+
+
+        {isOpen && !isLoading && (
+          <>
+            {error && (
+              <p className="mt-3 text-center text-sm font-medium text-white/90">⚠️ {error}</p>
+            )}
+
+            <p className="mt-4 text-center text-[13px] font-medium text-white/90">
+              🔒 Your privacy is guaranteed. We collect no personal data whatsoever.
+            </p>
+
+            <div className="mt-5 flex justify-center">
+              <button
+                type="submit"
+                disabled={pending}
+                className="w-[90%] rounded-full bg-black py-4 text-base font-bold text-white transition-all hover:bg-gray-800 disabled:opacity-40"
+                style={{ borderRadius: '9999px' }}
+              >
+                {pending ? "⏳ Sending..." : "Send!"}
+              </button>
+            </div>
+          </>
+        )}
+      </form>
+      {/* Captcha Modal */}
+      {showCaptcha && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-[32px] bg-white p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="mb-6 text-center">
+              <h3 className="text-xl font-bold text-gray-900">Security Check</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Please verify you're human to send your question.
+              </p>
+            </div>
+            
+            <div className="flex justify-center min-h-[65px]">
+              <Turnstile
+                onVerify={(token) => {
+                  setCaptchaToken(token);
+                  setShowCaptcha(false);
+                  // Use a small timeout to ensure state updates before re-submitting
+                  setTimeout(() => {
+                    formRef.current?.requestSubmit();
+                  }, 100);
+                }}
+                onExpire={() => setCaptchaToken("")}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowCaptcha(false)}
+              className="mt-6 w-full text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
