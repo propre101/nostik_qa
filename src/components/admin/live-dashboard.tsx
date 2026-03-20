@@ -161,9 +161,9 @@ export function LiveDashboard({
 
       {currentQuestion ? (
         <div key={currentQuestion.id} className="flex flex-col items-center w-full max-w-3xl animate-in fade-in slide-in-from-bottom-8 duration-500 z-10">
-          <div className="bg-white/95 backdrop-blur-xl shadow-2xl rounded-[2.5rem] w-full p-10 mb-8 relative overflow-hidden text-center min-h-[40vh] flex flex-col justify-center">
+          <div className="bg-white/95 backdrop-blur-xl shadow-2xl rounded-[2.5rem] w-full pt-20 pb-10 px-6 sm:px-10 mb-8 relative overflow-hidden text-center min-h-[40vh] max-h-[55vh] flex flex-col">
             
-            <div className="absolute top-6 left-6 flex gap-2">
+            <div className="absolute top-6 left-6 flex gap-2 z-10">
               {currentQuestion.topic && (
                 (() => {
                   const conf = TOPIC_CONFIG[currentQuestion.topic] || TOPIC_CONFIG.other;
@@ -196,9 +196,13 @@ export function LiveDashboard({
               )}
             </div>
 
-            <p className="text-3xl sm:text-4xl md:text-5xl leading-snug whitespace-pre-wrap font-bold mt-10 text-gray-900">
-              {currentQuestion.content}
-            </p>
+            <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 w-full [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300/50 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400/50 [&::-webkit-scrollbar-thumb]:rounded-full pr-2 -mr-2">
+              <div className="min-h-full flex flex-col justify-center w-full">
+                <p className="text-3xl sm:text-4xl md:text-5xl leading-snug whitespace-pre-wrap break-words font-bold text-gray-900 py-4">
+                  {currentQuestion.content}
+                </p>
+              </div>
+            </div>
           </div>
 
           <button 
